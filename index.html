@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>World Cup 2026 — Lịch vòng bảng (giờ VN)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e16; --bg2:#0f1521; --panel:#131b29; --panel2:#1a2436;
+    --line:#243042; --txt:#e8edf5; --mut:#7c8aa0; --mut2:#566175;
+    --toi:#3ddc97; --khuya:#f5b841; --rangsang:#ff7a59; --sang:#5ab0ff;
+    --acc:#e6ff4d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(90,176,255,.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(61,220,151,.06), transparent 55%),
+      var(--bg);
+    color:var(--txt); font-family:'Sora',sans-serif; line-height:1.5;
+    padding:28px 18px 80px; min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  .kicker{font-family:'Barlow Condensed',sans-serif;letter-spacing:.28em;text-transform:uppercase;
+    color:var(--acc);font-weight:700;font-size:13px}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,7vw,76px);line-height:.92;
+    letter-spacing:.01em;margin:6px 0 4px}
+  h1 .yr{color:var(--acc)}
+  .sub{color:var(--mut);font-size:14px;max-width:640px}
+  .sub b{color:var(--txt)}
+  .warn{margin-top:12px;font-size:12.5px;color:var(--mut);border-left:2px solid var(--rangsang);
+    padding:6px 0 6px 12px;background:linear-gradient(90deg,rgba(255,122,89,.06),transparent)}
+
+  /* distribution tiles */
+  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 8px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;
+    position:relative;overflow:hidden;cursor:pointer;transition:.18s}
+  .tile:hover{transform:translateY(-2px);border-color:var(--mut2)}
+  .tile.on{box-shadow:0 0 0 1.5px var(--tc) inset}
+  .tile .n{font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:.85;color:var(--tc)}
+  .tile .lab{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.05em;font-size:15px;margin-top:4px}
+  .tile .rng{font-size:11.5px;color:var(--mut);margin-top:2px}
+  .tile .bar{position:absolute;left:0;bottom:0;height:4px;background:var(--tc);width:var(--w,0)}
+
+  /* filter bar */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 18px;
+    background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .fl{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
+    letter-spacing:.06em;font-size:12px;color:var(--mut2);margin-right:2px}
+  .chip{font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px;cursor:pointer;
+    background:var(--panel2);border:1px solid var(--line);color:var(--mut);transition:.15s;user-select:none}
+  .chip:hover{color:var(--txt);border-color:var(--mut2)}
+  .chip.on{background:var(--acc);color:#0a0e16;border-color:var(--acc)}
+  .gchip.on{background:var(--txt);color:#0a0e16;border-color:var(--txt)}
+  input.search{flex:1;min-width:160px;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);border-radius:10px;padding:9px 13px;font-family:'Sora';font-size:13.5px;outline:none}
+  input.search:focus{border-color:var(--acc)}
+  input.search::placeholder{color:var(--mut2)}
+  .star-t{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;color:var(--mut);font-weight:600}
+  .star-t.on{color:var(--acc)}
+  .sep{width:1px;height:22px;background:var(--line)}
+  .count{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+    color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+  .count b{font-family:'Bebas Neue';font-size:24px;color:var(--acc);vertical-align:-2px;margin-right:3px}
+
+  /* schedule */
+  .day{margin-top:26px}
+  .dayhead{display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line);
+    margin-bottom:12px;position:sticky;top:0;background:linear-gradient(var(--bg) 70%,transparent);z-index:5;padding-top:6px}
+  .dayhead .dd{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.02em}
+  .dayhead .dw{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.12em;
+    font-size:13px;color:var(--mut);font-weight:600}
+  .dayhead .dn{margin-left:auto;font-size:12px;color:var(--mut2)}
+
+  .match{display:grid;grid-template-columns:78px 34px 1fr auto;gap:14px;align-items:center;
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:9px;
+    border-left:4px solid var(--c);transition:.14s}
+  .match:hover{background:var(--panel2);transform:translateX(3px)}
+  .mt{display:flex;flex-direction:column;line-height:1}
+  .mt .h{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--c)}
+  .mt .et{font-size:10.5px;color:var(--mut2);margin-top:3px;letter-spacing:.02em}
+  .gb{font-family:'Bebas Neue';font-size:20px;width:34px;height:34px;display:grid;place-items:center;
+    border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--mut)}
+  .teams{font-weight:600;font-size:15.5px}
+  .teams .vs{color:var(--mut2);font-weight:500;margin:0 7px;font-size:13px}
+  .venue{font-size:11.5px;color:var(--mut);margin-top:3px}
+  .star{color:var(--acc);font-size:14px}
+  .meta{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .tag{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+    font-size:10.5px;padding:3px 8px;border-radius:6px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
+  .empty{text-align:center;color:var(--mut);padding:50px;font-size:14px}
+
+  @media(max-width:680px){
+    .dist{grid-template-columns:repeat(2,1fr)}
+    .match{grid-template-columns:64px 1fr;grid-template-areas:"t teams" "t teams";row-gap:6px}
+    .match .gb{display:none}.meta{display:none}
+    .mt .h{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">FIFA World Cup · USA · Canada · Mexico</div>
+  <h1>LỊCH VÒNG BẢNG <span class="yr">2026</span></h1>
+  <div class="sub"><b>72 trận · 12 bảng · 11–27/6 (giờ Mỹ).</b> Toàn bộ quy đổi sang <b>giờ Việt Nam (UTC+7 = ET + 11h)</b>. Ngày trong ngoặc là ngày bạn cần thức/dậy để xem.</div>
+  <div class="warn">Đây là <b>giờ bóng lăn quy đổi</b>, không phải lịch phát của đài VN cụ thể (bản quyền VTV/đối tác chưa verify). Khung giờ xem thì chính xác.</div>
+
+  <div class="dist" id="dist"></div>
+
+  <div class="filters">
+    <span class="fl">Bảng</span>
+    <span id="groups" style="display:flex;flex-wrap:wrap;gap:7px"></span>
+    <div class="sep"></div>
+    <input class="search" id="q" placeholder="Tìm đội (vd: Brazil, Anh, Argentina)…">
+    <div class="star-t" id="starT"><span>★</span><span>Chỉ tâm điểm</span></div>
+    <div class="count" id="count"></div>
+  </div>
+
+  <div id="sched"></div>
+  <div class="empty" id="empty" style="display:none">Không có trận nào khớp bộ lọc.</div>
+</div>
+
+<script>
+/* [date, time, group, home, away, venue, et, star] */
+var M=[
+["12/6","02:00","A","Mexico","Nam Phi","Azteca, Mexico City","15:00",1],
+["12/6","09:00","A","Hàn Quốc","CH Séc","Akron, Zapopan","22:00",0],
+["13/6","02:00","B","Canada","Bosnia","BMO Field, Toronto","15:00",0],
+["13/6","08:00","D","Mỹ","Paraguay","SoFi, Inglewood","21:00",0],
+["14/6","02:00","B","Qatar","Thụy Sĩ","Levi's, Santa Clara","15:00",0],
+["14/6","05:00","C","Brazil","Maroc","MetLife, New Jersey","18:00",1],
+["14/6","08:00","C","Haiti","Scotland","Gillette, Foxborough","21:00",0],
+["14/6","11:00","D","Úc","Thổ Nhĩ Kỳ","BC Place, Vancouver","00:00",0],
+["15/6","00:00","E","Đức","Curaçao","NRG, Houston","13:00",1],
+["15/6","03:00","F","Hà Lan","Nhật Bản","AT&T, Arlington","16:00",1],
+["15/6","06:00","E","Bờ Biển Ngà","Ecuador","Lincoln Financial, Philadelphia","19:00",0],
+["15/6","09:00","F","Thụy Điển","Tunisia","BBVA, Monterrey","22:00",0],
+["15/6","23:00","H","Tây Ban Nha","Cape Verde","Mercedes-Benz, Atlanta","12:00",1],
+["16/6","02:00","G","Bỉ","Ai Cập","Lumen, Seattle","15:00",0],
+["16/6","05:00","H","Ả Rập Xê Út","Uruguay","Hard Rock, Miami","18:00",0],
+["16/6","08:00","G","Iran","New Zealand","SoFi, Inglewood","21:00",0],
+["17/6","02:00","I","Pháp","Senegal","MetLife, New Jersey","15:00",1],
+["17/6","05:00","I","Iraq","Na Uy","Gillette, Foxborough","18:00",0],
+["17/6","08:00","J","Argentina","Algeria","Arrowhead, Kansas City","21:00",1],
+["17/6","11:00","J","Áo","Jordan","Levi's, Santa Clara","00:00",0],
+["18/6","00:00","K","Bồ Đào Nha","CHDC Congo","NRG, Houston","13:00",1],
+["18/6","03:00","L","Anh","Croatia","AT&T, Arlington","16:00",1],
+["18/6","06:00","L","Ghana","Panama","BMO Field, Toronto","19:00",0],
+["18/6","09:00","K","Uzbekistan","Colombia","Azteca, Mexico City","22:00",0],
+["18/6","23:00","A","CH Séc","Nam Phi","Mercedes-Benz, Atlanta","12:00",0],
+["19/6","02:00","B","Thụy Sĩ","Bosnia","SoFi, Inglewood","15:00",0],
+["19/6","05:00","B","Canada","Qatar","BC Place, Vancouver","18:00",0],
+["19/6","08:00","A","Mexico","Hàn Quốc","Akron, Zapopan","21:00",1],
+["20/6","02:00","D","Mỹ","Úc","Lumen, Seattle","15:00",0],
+["20/6","05:00","C","Scotland","Maroc","Gillette, Foxborough","18:00",0],
+["20/6","07:30","C","Brazil","Haiti","Lincoln Financial, Philadelphia","20:30",1],
+["20/6","10:00","D","Thổ Nhĩ Kỳ","Paraguay","Levi's, Santa Clara","23:00",0],
+["21/6","00:00","F","Hà Lan","Thụy Điển","NRG, Houston","13:00",0],
+["21/6","03:00","E","Đức","Bờ Biển Ngà","BMO Field, Toronto","16:00",1],
+["21/6","07:00","E","Ecuador","Curaçao","Arrowhead, Kansas City","20:00",0],
+["21/6","11:00","F","Tunisia","Nhật Bản","BBVA, Monterrey","00:00",0],
+["21/6","23:00","H","Tây Ban Nha","Ả Rập Xê Út","Mercedes-Benz, Atlanta","12:00",1],
+["22/6","02:00","G","Bỉ","Iran","SoFi, Inglewood","15:00",0],
+["22/6","05:00","H","Uruguay","Cape Verde","Hard Rock, Miami","18:00",0],
+["22/6","08:00","G","New Zealand","Ai Cập","BC Place, Vancouver","21:00",0],
+["23/6","00:00","J","Argentina","Áo","AT&T, Arlington","13:00",1],
+["23/6","04:00","I","Pháp","Iraq","Lincoln Financial, Philadelphia","17:00",1],
+["23/6","07:00","I","Na Uy","Senegal","MetLife, New Jersey","20:00",0],
+["23/6","10:00","J","Jordan","Algeria","Levi's, Santa Clara","23:00",0],
+["24/6","00:00","K","Bồ Đào Nha","Uzbekistan","NRG, Houston","13:00",1],
+["24/6","03:00","L","Anh","Ghana","Gillette, Foxborough","16:00",1],
+["24/6","06:00","L","Panama","Croatia","BMO Field, Toronto","19:00",0],
+["24/6","09:00","K","Colombia","CHDC Congo","Akron, Zapopan","22:00",0],
+["25/6","02:00","B","Thụy Sĩ","Canada","BC Place, Vancouver","15:00",0],
+["25/6","02:00","B","Bosnia","Qatar","Lumen, Seattle","15:00",0],
+["25/6","05:00","C","Scotland","Brazil","Hard Rock, Miami","18:00",1],
+["25/6","05:00","C","Maroc","Haiti","Mercedes-Benz, Atlanta","18:00",0],
+["25/6","08:00","A","CH Séc","Mexico","Azteca, Mexico City","21:00",1],
+["25/6","08:00","A","Nam Phi","Hàn Quốc","BBVA, Monterrey","21:00",0],
+["26/6","03:00","E","Curaçao","Bờ Biển Ngà","Lincoln Financial, Philadelphia","16:00",0],
+["26/6","03:00","E","Ecuador","Đức","MetLife, New Jersey","16:00",1],
+["26/6","06:00","F","Nhật Bản","Thụy Điển","AT&T, Arlington","19:00",0],
+["26/6","06:00","F","Tunisia","Hà Lan","Arrowhead, Kansas City","19:00",1],
+["26/6","09:00","D","Thổ Nhĩ Kỳ","Mỹ","SoFi, Inglewood","22:00",1],
+["26/6","09:00","D","Paraguay","Úc","Levi's, Santa Clara","22:00",0],
+["27/6","02:00","I","Na Uy","Pháp","Gillette, Foxborough","15:00",1],
+["27/6","02:00","I","Senegal","Iraq","BMO Field, Toronto","15:00",0],
+["27/6","07:00","H","Cape Verde","Ả Rập Xê Út","NRG, Houston","20:00",0],
+["27/6","07:00","H","Uruguay","Tây Ban Nha","Akron, Zapopan","20:00",1],
+["27/6","10:00","G","Ai Cập","Iran","Lumen, Seattle","23:00",0],
+["27/6","10:00","G","New Zealand","Bỉ","BC Place, Vancouver","23:00",0],
+["28/6","04:00","L","Panama","Anh","MetLife, New Jersey","17:00",1],
+["28/6","04:00","L","Croatia","Ghana","Lincoln Financial, Philadelphia","17:00",0],
+["28/6","06:30","K","Colombia","Bồ Đào Nha","Hard Rock, Miami","19:30",1],
+["28/6","06:30","K","CHDC Congo","Uzbekistan","Mercedes-Benz, Atlanta","19:30",0],
+["28/6","09:00","J","Algeria","Áo","Arrowhead, Kansas City","22:00",0],
+["28/6","09:00","J","Jordan","Argentina","AT&T, Arlington","22:00",1]
+];
+
+var DOW={"12/6":"Thứ 6","13/6":"Thứ 7","14/6":"CN","15/6":"Thứ 2","16/6":"Thứ 3","17/6":"Thứ 4",
+"18/6":"Thứ 5","19/6":"Thứ 6","20/6":"Thứ 7","21/6":"CN","22/6":"Thứ 2","23/6":"Thứ 3","24/6":"Thứ 4",
+"25/6":"Thứ 5","26/6":"Thứ 6","27/6":"Thứ 7","28/6":"CN"};
+
+var BANDS={
+  toi:{lab:"Tối",rng:"23:00 · dễ xem nhất",c:"var(--toi)"},
+  khuya:{lab:"Khuya",rng:"00:00–03:59",c:"var(--khuya)"},
+  rangsang:{lab:"Rạng sáng",rng:"04:00–07:59",c:"var(--rangsang)"},
+  sang:{lab:"Sáng",rng:"08:00–11:59",c:"var(--sang)"}
+};
+function bandOf(t){var p=t.split(":");var m=+p[0]*60+ +p[1];
+  if(m>=1380)return"toi"; if(m<240)return"khuya"; if(m<480)return"rangsang"; return"sang";}
+
+var state={bands:{},group:null,star:false,q:""};
+
+/* distribution tiles */
+var counts={toi:0,khuya:0,rangsang:0,sang:0};
+M.forEach(function(m){counts[bandOf(m[1])]++;});
+var maxc=Math.max(counts.toi,counts.khuya,counts.rangsang,counts.sang);
+var distEl=document.getElementById("dist");
+["toi","khuya","rangsang","sang"].forEach(function(b){
+  var d=document.createElement("div");d.className="tile";d.style.setProperty("--tc",BANDS[b].c);
+  d.innerHTML='<div class="n">'+counts[b]+'</div><div class="lab">'+BANDS[b].lab+
+    '</div><div class="rng">'+BANDS[b].rng+'</div><div class="bar" style="--w:'+(counts[b]/maxc*100)+'%"></div>';
+  d.onclick=function(){state.bands[b]=!state.bands[b];d.classList.toggle("on");render();};
+  distEl.appendChild(d);
+});
+
+/* group chips */
+var gEl=document.getElementById("groups");
+"A B C D E F G H I J K L".split(" ").forEach(function(g){
+  var c=document.createElement("span");c.className="chip gchip";c.textContent=g;
+  c.onclick=function(){
+    if(state.group===g){state.group=null;}else{state.group=g;}
+    [].forEach.call(gEl.children,function(x){x.classList.toggle("on",x.textContent===state.group);});
+    render();
+  };
+  gEl.appendChild(c);
+});
+
+document.getElementById("q").addEventListener("input",function(e){state.q=e.target.value.trim().toLowerCase();render();});
+var sT=document.getElementById("starT");
+sT.onclick=function(){state.star=!state.star;sT.classList.toggle("on");render();};
+
+function pass(m){
+  var bands=Object.keys(state.bands).filter(function(k){return state.bands[k];});
+  if(bands.length && bands.indexOf(bandOf(m[1]))<0) return false;
+  if(state.group && m[2]!==state.group) return false;
+  if(state.star && !m[7]) return false;
+  if(state.q){ if((m[3]+" "+m[4]).toLowerCase().indexOf(state.q)<0) return false; }
+  return true;
+}
+
+function render(){
+  var box=document.getElementById("sched");box.innerHTML="";
+  var filtered=M.filter(pass);
+  document.getElementById("count").innerHTML="<b>"+filtered.length+"</b> trận";
+  document.getElementById("empty").style.display=filtered.length?"none":"block";
+  var byDay={};var order=[];
+  filtered.forEach(function(m){ if(!byDay[m[0]]){byDay[m[0]]=[];order.push(m[0]);} byDay[m[0]].push(m);});
+  order.forEach(function(day){
+    var sec=document.createElement("div");sec.className="day";
+    sec.innerHTML='<div class="dayhead"><span class="dd">'+day+'</span><span class="dw">'+DOW[day]+
+      '</span><span class="dn">'+byDay[day].length+' trận</span></div>';
+    byDay[day].forEach(function(m){
+      var b=bandOf(m[1]);
+      var row=document.createElement("div");row.className="match";row.style.setProperty("--c",BANDS[b].c);
+      row.innerHTML=
+        '<div class="mt"><span class="h">'+m[1]+'</span><span class="et">'+m[6]+' ET</span></div>'+
+        '<div class="gb">'+m[2]+'</div>'+
+        '<div><div class="teams">'+(m[7]?'<span class="star">★</span> ':'')+m[3]+
+          '<span class="vs">vs</span>'+m[4]+'</div><div class="venue">'+m[5]+'</div></div>'+
+        '<div class="meta"><span class="tag">'+BANDS[b].lab+'</span></div>';
+      sec.appendChild(row);
+    });
+    box.appendChild(sec);
+  });
+}
+render();
+</script>
+</body>
+</html>
