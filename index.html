@@ -2,7 +2,10 @@
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e16">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>World Cup 2026 — Lịch vòng bảng (giờ VN)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,111 +16,143 @@
     --line:#243042; --txt:#e8edf5; --mut:#7c8aa0; --mut2:#566175;
     --toi:#3ddc97; --khuya:#f5b841; --rangsang:#ff7a59; --sang:#5ab0ff;
     --acc:#e6ff4d;
+    --pad: max(16px, env(safe-area-inset-left));
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   body{
     background:
       radial-gradient(1200px 600px at 80% -10%, rgba(90,176,255,.08), transparent 60%),
       radial-gradient(900px 500px at -10% 110%, rgba(61,220,151,.06), transparent 55%),
       var(--bg);
-    color:var(--txt); font-family:'Sora',sans-serif; line-height:1.5;
-    padding:28px 18px 80px; min-height:100vh;
+    background-attachment:fixed;
+    color:var(--txt); font-family:'Sora',-apple-system,BlinkMacSystemFont,sans-serif; line-height:1.5;
+    min-height:100vh; min-height:100dvh; overflow-x:hidden;
+    padding:
+      calc(24px + env(safe-area-inset-top)) var(--pad)
+      calc(64px + env(safe-area-inset-bottom)) var(--pad);
+    -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1180px;margin:0 auto}
-  .kicker{font-family:'Barlow Condensed',sans-serif;letter-spacing:.28em;text-transform:uppercase;
-    color:var(--acc);font-weight:700;font-size:13px}
-  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,7vw,76px);line-height:.92;
-    letter-spacing:.01em;margin:6px 0 4px}
+  .wrap{max-width:1180px;margin:0 auto;animation:rise .5s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .kicker{font-family:'Barlow Condensed',sans-serif;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--acc);font-weight:700;font-size:12px}
+  h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,11vw,76px);line-height:.9;
+    letter-spacing:.01em;margin:6px 0 6px}
   h1 .yr{color:var(--acc)}
   .sub{color:var(--mut);font-size:14px;max-width:640px}
   .sub b{color:var(--txt)}
   .warn{margin-top:12px;font-size:12.5px;color:var(--mut);border-left:2px solid var(--rangsang);
-    padding:6px 0 6px 12px;background:linear-gradient(90deg,rgba(255,122,89,.06),transparent)}
+    padding:6px 0 6px 12px;background:linear-gradient(90deg,rgba(255,122,89,.06),transparent);
+    overflow-wrap:anywhere}
 
   /* distribution tiles */
-  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 8px}
-  .tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;
-    position:relative;overflow:hidden;cursor:pointer;transition:.18s}
-  .tile:hover{transform:translateY(-2px);border-color:var(--mut2)}
+  .dist{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:24px 0 8px}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 14px 13px;
+    position:relative;overflow:hidden;cursor:pointer;transition:transform .18s,border-color .18s;
+    min-height:96px;-webkit-user-select:none;user-select:none}
+  .tile:active{transform:scale(.98)}
   .tile.on{box-shadow:0 0 0 1.5px var(--tc) inset}
-  .tile .n{font-family:'Bebas Neue',sans-serif;font-size:46px;line-height:.85;color:var(--tc)}
+  .tile .n{font-family:'Bebas Neue',sans-serif;font-size:44px;line-height:.8;color:var(--tc)}
   .tile .lab{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
-    letter-spacing:.05em;font-size:15px;margin-top:4px}
-  .tile .rng{font-size:11.5px;color:var(--mut);margin-top:2px}
+    letter-spacing:.04em;font-size:14px;margin-top:5px}
+  .tile .rng{font-size:11px;color:var(--mut);margin-top:2px;overflow-wrap:anywhere}
   .tile .bar{position:absolute;left:0;bottom:0;height:4px;background:var(--tc);width:var(--w,0)}
 
-  /* filter bar */
-  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:22px 0 18px;
+  /* filters — vertical stack, robust on every width */
+  .filters{display:flex;flex-direction:column;gap:11px;margin:22px 0 16px;
     background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .frow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
   .fl{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;
-    letter-spacing:.06em;font-size:12px;color:var(--mut2);margin-right:2px}
-  .chip{font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:999px;cursor:pointer;
-    background:var(--panel2);border:1px solid var(--line);color:var(--mut);transition:.15s;user-select:none}
-  .chip:hover{color:var(--txt);border-color:var(--mut2)}
-  .chip.on{background:var(--acc);color:#0a0e16;border-color:var(--acc)}
-  .gchip.on{background:var(--txt);color:#0a0e16;border-color:var(--txt)}
-  input.search{flex:1;min-width:160px;background:var(--panel2);border:1px solid var(--line);
-    color:var(--txt);border-radius:10px;padding:9px 13px;font-family:'Sora';font-size:13.5px;outline:none}
+    letter-spacing:.06em;font-size:12px;color:var(--mut2);flex:0 0 auto}
+  .gchips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:13px;font-weight:600;padding:9px 13px;min-height:38px;display:inline-flex;align-items:center;
+    border-radius:999px;cursor:pointer;background:var(--panel2);border:1px solid var(--line);
+    color:var(--mut);transition:.15s;-webkit-user-select:none;user-select:none}
+  .chip:active{transform:scale(.96)}
+  .chip.on{background:var(--txt);color:#0a0e16;border-color:var(--txt)}
+  input.search{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:12px 14px;font-family:'Sora';font-size:16px;outline:none}
   input.search:focus{border-color:var(--acc)}
   input.search::placeholder{color:var(--mut2)}
-  .star-t{display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12.5px;color:var(--mut);font-weight:600}
-  .star-t.on{color:var(--acc)}
-  .sep{width:1px;height:22px;background:var(--line)}
-  .count{margin-left:auto;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
-    color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+  .toolrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .star-t{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-size:13px;color:var(--mut);
+    font-weight:600;padding:8px 12px;min-height:38px;border-radius:10px;border:1px solid var(--line);
+    background:var(--panel2);-webkit-user-select:none;user-select:none}
+  .star-t:active{transform:scale(.97)}
+  .star-t.on{color:#0a0e16;background:var(--acc);border-color:var(--acc)}
+  .count{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--mut);
+    text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
   .count b{font-family:'Bebas Neue';font-size:24px;color:var(--acc);vertical-align:-2px;margin-right:3px}
 
   /* schedule */
-  .day{margin-top:26px}
-  .dayhead{display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line);
-    margin-bottom:12px;position:sticky;top:0;background:linear-gradient(var(--bg) 70%,transparent);z-index:5;padding-top:6px}
-  .dayhead .dd{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.02em}
-  .dayhead .dw{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.12em;
-    font-size:13px;color:var(--mut);font-weight:600}
-  .dayhead .dn{margin-left:auto;font-size:12px;color:var(--mut2)}
+  .day{margin-top:22px}
+  .dayhead{display:flex;align-items:baseline;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);
+    margin-bottom:11px;position:-webkit-sticky;position:sticky;top:0;background:var(--bg);z-index:5}
+  .dayhead .dd{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.02em}
+  .dayhead .dw{font-family:'Barlow Condensed';text-transform:uppercase;letter-spacing:.1em;
+    font-size:12.5px;color:var(--mut);font-weight:600}
+  .dayhead .dn{margin-left:auto;font-size:11.5px;color:var(--mut2);white-space:nowrap}
 
-  .match{display:grid;grid-template-columns:78px 34px 1fr auto;gap:14px;align-items:center;
-    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 16px;margin-bottom:9px;
-    border-left:4px solid var(--c);transition:.14s}
-  .match:hover{background:var(--panel2);transform:translateX(3px)}
-  .mt{display:flex;flex-direction:column;line-height:1}
+  .match{display:grid;column-gap:13px;align-items:center;
+    grid-template-columns:78px 36px 1fr auto;
+    grid-template-areas:"time grp teams tag";
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:13px 15px;margin-bottom:9px;border-left:4px solid var(--c);
+    transition:background .14s,transform .14s}
+  .match:active{background:var(--panel2)}
+  .mt{grid-area:time;display:flex;flex-direction:column;line-height:1}
   .mt .h{font-family:'Bebas Neue',sans-serif;font-size:30px;color:var(--c)}
-  .mt .et{font-size:10.5px;color:var(--mut2);margin-top:3px;letter-spacing:.02em}
-  .gb{font-family:'Bebas Neue';font-size:20px;width:34px;height:34px;display:grid;place-items:center;
-    border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--mut)}
-  .teams{font-weight:600;font-size:15.5px}
-  .teams .vs{color:var(--mut2);font-weight:500;margin:0 7px;font-size:13px}
-  .venue{font-size:11.5px;color:var(--mut);margin-top:3px}
-  .star{color:var(--acc);font-size:14px}
-  .meta{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .mt .et{font-size:10.5px;color:var(--mut2);margin-top:3px}
+  .gb{grid-area:grp;font-family:'Bebas Neue';font-size:20px;width:36px;height:36px;display:grid;
+    place-items:center;border-radius:8px;background:var(--panel2);border:1px solid var(--line);color:var(--mut)}
+  .teamswrap{grid-area:teams;min-width:0}
+  .teams{font-weight:600;font-size:15px;overflow-wrap:anywhere}
+  .teams .vs{color:var(--mut2);font-weight:500;margin:0 6px;font-size:13px}
+  .venue{font-size:11.5px;color:var(--mut);margin-top:3px;overflow-wrap:anywhere}
+  .star{color:var(--acc)}
+  .meta{grid-area:tag;justify-self:end}
   .tag{font-family:'Barlow Condensed';font-weight:700;text-transform:uppercase;letter-spacing:.05em;
-    font-size:10.5px;padding:3px 8px;border-radius:6px;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent)}
-  .empty{text-align:center;color:var(--mut);padding:50px;font-size:14px}
+    font-size:10.5px;padding:3px 8px;border-radius:6px;color:var(--c);background:var(--cbg);white-space:nowrap}
+  .empty{text-align:center;color:var(--mut);padding:48px 12px;font-size:14px}
 
+  /* MOBILE */
   @media(max-width:680px){
     .dist{grid-template-columns:repeat(2,1fr)}
-    .match{grid-template-columns:64px 1fr;grid-template-areas:"t teams" "t teams";row-gap:6px}
-    .match .gb{display:none}.meta{display:none}
-    .mt .h{font-size:26px}
+    .match{
+      grid-template-columns:auto 1fr;
+      grid-template-areas:
+        "time tag"
+        "teams teams";
+      row-gap:9px;column-gap:12px;align-items:center}
+    .gb{display:none}
+    .mt{flex-direction:row;align-items:baseline;gap:8px}
+    .mt .h{font-size:27px}
+    .mt .et{margin-top:0}
+    .meta{align-self:start}
+    .teams{font-size:15.5px}
   }
+  @media(max-width:360px){ .dist{grid-template-columns:1fr 1fr} .mt .h{font-size:24px} }
+  @media(prefers-reduced-motion:reduce){ .wrap{animation:none} *{transition:none!important} }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="kicker">FIFA World Cup · USA · Canada · Mexico</div>
   <h1>LỊCH VÒNG BẢNG <span class="yr">2026</span></h1>
-  <div class="sub"><b>72 trận · 12 bảng · 11–27/6 (giờ Mỹ).</b> Toàn bộ quy đổi sang <b>giờ Việt Nam (UTC+7 = ET + 11h)</b>. Ngày trong ngoặc là ngày bạn cần thức/dậy để xem.</div>
-  <div class="warn">Đây là <b>giờ bóng lăn quy đổi</b>, không phải lịch phát của đài VN cụ thể (bản quyền VTV/đối tác chưa verify). Khung giờ xem thì chính xác.</div>
+  <div class="sub"><b>72 trận · 12 bảng · 11–27/6 (giờ Mỹ).</b> Quy đổi sang <b>giờ Việt Nam (UTC+7 = ET + 11h)</b>. Ngày trong ngoặc là ngày (giờ VN) bạn cần thức khuya / dậy sớm để xem.</div>
+  <div class="warn">Đây là <b>giờ bóng lăn quy đổi</b>, không phải lịch phát của đài VN cụ thể (bản quyền VTV/đối tác chưa kiểm chứng). Riêng khung giờ trận đấu thì chính xác.</div>
 
   <div class="dist" id="dist"></div>
 
   <div class="filters">
-    <span class="fl">Bảng</span>
-    <span id="groups" style="display:flex;flex-wrap:wrap;gap:7px"></span>
-    <div class="sep"></div>
-    <input class="search" id="q" placeholder="Tìm đội (vd: Brazil, Anh, Argentina)…">
-    <div class="star-t" id="starT"><span>★</span><span>Chỉ tâm điểm</span></div>
-    <div class="count" id="count"></div>
+    <div class="frow"><span class="fl">Bảng</span><span class="gchips" id="groups"></span></div>
+    <div class="frow"><input class="search" id="q" placeholder="Tìm đội (vd: Brazil, Anh, Argentina)…"></div>
+    <div class="toolrow">
+      <div class="star-t" id="starT"><span>★</span><span>Chỉ tâm điểm</span></div>
+      <div class="count" id="count"></div>
+    </div>
   </div>
 
   <div id="sched"></div>
@@ -206,15 +241,19 @@ var DOW={"12/6":"Thứ 6","13/6":"Thứ 7","14/6":"CN","15/6":"Thứ 2","16/6":"
 "25/6":"Thứ 5","26/6":"Thứ 6","27/6":"Thứ 7","28/6":"CN"};
 
 var BANDS={
-  toi:{lab:"Tối",rng:"23:00 · dễ xem nhất",c:"var(--toi)"},
-  khuya:{lab:"Khuya",rng:"00:00–03:59",c:"var(--khuya)"},
-  rangsang:{lab:"Rạng sáng",rng:"04:00–07:59",c:"var(--rangsang)"},
-  sang:{lab:"Sáng",rng:"08:00–11:59",c:"var(--sang)"}
+  toi:{lab:"Tối",rng:"23:00 · dễ xem",c:"var(--toi)",cbg:"rgba(61,220,151,.14)"},
+  khuya:{lab:"Khuya",rng:"00:00–03:59",c:"var(--khuya)",cbg:"rgba(245,184,65,.14)"},
+  rangsang:{lab:"Rạng sáng",rng:"04:00–07:59",c:"var(--rangsang)",cbg:"rgba(255,122,89,.14)"},
+  sang:{lab:"Sáng",rng:"08:00–11:59",c:"var(--sang)",cbg:"rgba(90,176,255,.14)"}
 };
 function bandOf(t){var p=t.split(":");var m=+p[0]*60+ +p[1];
   if(m>=1380)return"toi"; if(m<240)return"khuya"; if(m<480)return"rangsang"; return"sang";}
 
 var state={bands:{},group:null,star:false,q:""};
+
+/* helper: escape user-facing strings into HTML */
+function esc(s){return String(s).replace(/[&<>"]/g,function(ch){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];});}
 
 /* distribution tiles */
 var counts={toi:0,khuya:0,rangsang:0,sang:0};
@@ -232,9 +271,9 @@ var distEl=document.getElementById("dist");
 /* group chips */
 var gEl=document.getElementById("groups");
 "A B C D E F G H I J K L".split(" ").forEach(function(g){
-  var c=document.createElement("span");c.className="chip gchip";c.textContent=g;
+  var c=document.createElement("span");c.className="chip";c.textContent=g;
   c.onclick=function(){
-    if(state.group===g){state.group=null;}else{state.group=g;}
+    state.group=(state.group===g)?null:g;
     [].forEach.call(gEl.children,function(x){x.classList.toggle("on",x.textContent===state.group);});
     render();
   };
@@ -250,7 +289,7 @@ function pass(m){
   if(bands.length && bands.indexOf(bandOf(m[1]))<0) return false;
   if(state.group && m[2]!==state.group) return false;
   if(state.star && !m[7]) return false;
-  if(state.q){ if((m[3]+" "+m[4]).toLowerCase().indexOf(state.q)<0) return false; }
+  if(state.q && (m[3]+" "+m[4]).toLowerCase().indexOf(state.q)<0) return false;
   return true;
 }
 
@@ -259,7 +298,7 @@ function render(){
   var filtered=M.filter(pass);
   document.getElementById("count").innerHTML="<b>"+filtered.length+"</b> trận";
   document.getElementById("empty").style.display=filtered.length?"none":"block";
-  var byDay={};var order=[];
+  var byDay={},order=[];
   filtered.forEach(function(m){ if(!byDay[m[0]]){byDay[m[0]]=[];order.push(m[0]);} byDay[m[0]].push(m);});
   order.forEach(function(day){
     var sec=document.createElement("div");sec.className="day";
@@ -267,12 +306,15 @@ function render(){
       '</span><span class="dn">'+byDay[day].length+' trận</span></div>';
     byDay[day].forEach(function(m){
       var b=bandOf(m[1]);
-      var row=document.createElement("div");row.className="match";row.style.setProperty("--c",BANDS[b].c);
+      var row=document.createElement("div");row.className="match";
+      row.style.setProperty("--c",BANDS[b].c);
+      row.style.setProperty("--cbg",BANDS[b].cbg);
       row.innerHTML=
         '<div class="mt"><span class="h">'+m[1]+'</span><span class="et">'+m[6]+' ET</span></div>'+
         '<div class="gb">'+m[2]+'</div>'+
-        '<div><div class="teams">'+(m[7]?'<span class="star">★</span> ':'')+m[3]+
-          '<span class="vs">vs</span>'+m[4]+'</div><div class="venue">'+m[5]+'</div></div>'+
+        '<div class="teamswrap"><div class="teams">'+(m[7]?'<span class="star">★</span> ':'')+
+          esc(m[3])+'<span class="vs">vs</span>'+esc(m[4])+'</div>'+
+          '<div class="venue">'+esc(m[5])+'</div></div>'+
         '<div class="meta"><span class="tag">'+BANDS[b].lab+'</span></div>';
       sec.appendChild(row);
     });
